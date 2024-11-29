@@ -593,7 +593,6 @@ require('lazy').setup({
         --
         -- But for many setups, the LSP (`ts_ls`) will work just fine
         ts_ls = {}, -- might need to do something a little more involved
-        volar = {},
 
         lua_ls = {
           -- cmd = {...},
@@ -1012,3 +1011,27 @@ require('lazy').setup({
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+
+-- If you are using mason.nvim, you can get the ts_plugin_path like this
+local mason_registry = require 'mason-registry'
+local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server'
+
+-- local vue_language_server_path = '/path/to/@vue/language-server'
+
+local lspconfig = require 'lspconfig'
+
+lspconfig.ts_ls.setup {
+  init_options = {
+    plugins = {
+      {
+        name = '@vue/typescript-plugin',
+        location = vue_language_server_path,
+        languages = { 'vue' },
+      },
+    },
+  },
+  filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
+}
+
+-- No need to set `hybridMode` to `true` as it's the default value
+lspconfig.volar.setup {}

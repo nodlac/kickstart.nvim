@@ -152,6 +152,17 @@ vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
 vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
 vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 
+
+
+-- toggle conform autoformat on save
+vim.api.nvim_create_user_command("FormatToggle", function(args)
+    vim.b.enable_autoformat = not vim.b.enable_autoformat
+end, {
+  desc = "Toggle autoformat-on-save for buffer",
+})
+
+vim.keymap.set('n', '<leader>F', '<cmd>FormatToggle<CR>')
+
 -- Keybinds to make split navigation easier.
 --  Use CTRL+<hjkl> to switch between windows
 --
@@ -664,29 +675,35 @@ require('lazy').setup({
     opts = {
       notify_on_error = false,
       format_on_save = function(bufnr)
+        if not vim.b[bufnr].enable_autoformat then
+          return
+        end
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = true, cpp = true }
-        local lsp_format_opt
+        local disable_filetypes = { vue = true, c = true, cpp = true }
         if disable_filetypes[vim.bo[bufnr].filetype] then
-          lsp_format_opt = 'never'
+          lsp_format_opt = 'first'
         else
           lsp_format_opt = 'fallback'
         end
+        local lsp_format_opt
         return {
           timeout_ms = 500,
           lsp_format = lsp_format_opt,
         }
       end,
       formatters_by_ft = {
+        css = { 'eslint_d', 'prettier', stop_after_first = true },
+        less = { 'eslint_d', 'prettier' },
         lua = { 'stylua' },
         -- Conform can also run multiple formatters sequentially
         python = { 'isort', 'black' },
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
         -- javascript = { "prettierd", "prettier", stop_after_first = true },
-        javascript = { 'eslint-d', 'prettier', stop_after_first = true },
+        javascript = { 'eslint_d', 'prettier', stop_after_first = true },
+        vue = { 'eslint_d', 'prettier', stop_after_first = true },
       },
     },
   },

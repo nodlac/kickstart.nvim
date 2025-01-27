@@ -152,13 +152,11 @@ vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
 vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
 vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 
-
-
 -- toggle conform autoformat on save
-vim.api.nvim_create_user_command("FormatToggle", function(args)
-    vim.b.enable_autoformat = not vim.b.enable_autoformat
+vim.api.nvim_create_user_command('FormatToggle', function(args)
+  vim.b.enable_autoformat = not vim.b.enable_autoformat
 end, {
-  desc = "Toggle autoformat-on-save for buffer",
+  desc = 'Toggle autoformat-on-save for buffer',
 })
 
 vim.keymap.set('n', '<leader>F', '<cmd>FormatToggle<CR>')
@@ -212,6 +210,7 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
+  'tpope/vim-surround', -- surround objects with text
 
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
@@ -667,7 +666,7 @@ require('lazy').setup({
         '<leader>f',
         function()
           require('conform').format { async = true, lsp_format = 'fallback' }
-        end,
+        end, -- might need to do something a little more involved
         mode = '',
         desc = '[F]ormat buffer',
       },
@@ -698,7 +697,7 @@ require('lazy').setup({
         less = { 'eslint_d', 'prettier' },
         lua = { 'stylua' },
         -- Conform can also run multiple formatters sequentially
-        python = { 'isort', 'black' },
+        python = { 'isort', 'black', stop_after_first = true },
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
         -- javascript = { "prettierd", "prettier", stop_after_first = true },
@@ -946,6 +945,9 @@ require('lazy').setup({
       end)
       vim.keymap.set('n', '<leader>l', function()
         ui.nav_file(4)
+      end)
+      vim.keymap.set('n', '<leader>;', function()
+        ui.nav_file(5)
       end)
     end,
   },
